@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "happy-hair-web",
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": ["node_modules/.bin/webpack", "serve", "--config", "web/webpack.config.js", "--mode", "development"],
+      "port": 3000
+    }
+  ]
+}

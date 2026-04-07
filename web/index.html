@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1A1A1A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Happy Hair" />
+    <meta name="description" content="Book your next salon appointment with Happy Hair" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Happy Hair</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; width: 100%; overflow: hidden; background-color: #1A1A1A; }
+      #root { display: flex; flex: 1; height: 100vh; width: 100%; flex-direction: column; }
+      /* React Native Web root div */
+      #root > div { display: flex; flex: 1; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.__initErrors = [];
+      window.addEventListener('error', function(e) {
+        window.__initErrors.push({ msg: e.message, file: e.filename, line: e.lineno });
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        window.__initErrors.push({ msg: String(e.reason) });
+      });
+    </script>
+  </body>
+</html>
