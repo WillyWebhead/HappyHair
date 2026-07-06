@@ -12,6 +12,7 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { MOCK_STYLISTS, formatDuration } from '../data/stylists';
 import ServiceBadge from '../components/ServiceBadge';
+import { Chevron } from '../components/icons';
 import { colors, radius, shadows, spacing, typography } from '../theme';
 
 type Props = {
@@ -67,29 +68,31 @@ export default function StylistDetailScreen({ navigation, route }: Props) {
         {/* Services */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Services</Text>
-          {stylist.services.map(service => (
-            <TouchableOpacity
-              key={service.id}
-              style={styles.serviceRow}
-              activeOpacity={0.7}
-              onPress={() =>
-                navigation.navigate('Booking', {
-                  stylistId: stylist.id,
-                  serviceId: service.id,
-                })
-              }>
-              <View style={styles.serviceInfo}>
-                <Text style={styles.serviceName}>{service.name}</Text>
-                <Text style={styles.serviceMeta}>
-                  {formatDuration(service.durationMinutes)}
-                </Text>
-              </View>
-              <View style={styles.serviceRight}>
-                <Text style={styles.servicePrice}>${service.priceUsd}</Text>
-                <Text style={styles.serviceArrow}>→</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+          <View style={styles.serviceList}>
+            {stylist.services.map((service, i) => (
+              <TouchableOpacity
+                key={service.id}
+                style={[styles.serviceRow, i > 0 && styles.serviceRowBorder]}
+                activeOpacity={0.7}
+                onPress={() =>
+                  navigation.navigate('Booking', {
+                    stylistId: stylist.id,
+                    serviceId: service.id,
+                  })
+                }>
+                <View style={styles.serviceInfo}>
+                  <Text style={styles.serviceName}>{service.name}</Text>
+                  <Text style={styles.serviceMeta}>
+                    {formatDuration(service.durationMinutes)}
+                  </Text>
+                </View>
+                <View style={styles.serviceRight}>
+                  <Text style={styles.servicePrice}>${service.priceUsd}</Text>
+                  <Chevron />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         <View style={styles.bottomPad} />
@@ -103,7 +106,9 @@ export default function StylistDetailScreen({ navigation, route }: Props) {
           onPress={() =>
             navigation.navigate('Booking', { stylistId: stylist.id })
           }>
-          <Text style={styles.bookButtonText}>Book with {stylist.name.split(' ')[0]}</Text>
+          <Text style={styles.bookButtonText}>
+            Book with {stylist.name.split(' ')[0]}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -144,67 +149,77 @@ const styles = StyleSheet.create({
     height: 88,
     borderRadius: 44,
     backgroundColor: colors.surfaceRaised,
-    borderWidth: 2,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
   initials: {
     color: colors.gold,
+    fontFamily: typography.fontFamilyHeading,
     fontSize: typography.size.xl,
-    fontWeight: typography.weight.bold,
     letterSpacing: 1,
   },
   name: {
     color: colors.textPrimary,
     fontSize: typography.size.xl,
-    fontWeight: typography.weight.bold,
     fontFamily: typography.fontFamilyHeading,
     marginBottom: spacing.xs,
   },
   title: {
     color: colors.gold,
-    fontSize: typography.size.base,
+    fontSize: typography.size.sm,
     fontWeight: typography.weight.medium,
-    marginBottom: spacing.xs,
+    letterSpacing: typography.trackingWide,
+    textTransform: 'uppercase',
+    marginBottom: spacing.sm,
   },
   experience: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.sm,
   },
   section: {
     marginBottom: spacing.xl,
   },
   sectionLabel: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 2,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWider,
     textTransform: 'uppercase',
     marginBottom: spacing.md,
   },
   bio: {
-    color: colors.textPrimary,
+    color: colors.textSecondary,
     fontSize: typography.size.base,
-    lineHeight: typography.size.base * 1.7,
+    lineHeight: typography.size.base * 1.75,
     fontWeight: typography.weight.regular,
   },
   badges: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
+  serviceList: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    ...shadows.card,
+  },
   serviceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
     padding: spacing.md,
-    marginBottom: spacing.sm,
-    ...shadows.card,
+    paddingHorizontal: spacing.lg,
+  },
+  serviceRowBorder: {
+    borderTopWidth: 1,
+    borderTopColor: colors.borderSubtle,
   },
   serviceInfo: {
     flex: 1,
+    paddingRight: spacing.md,
   },
   serviceName: {
     color: colors.textPrimary,
@@ -213,22 +228,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xxs,
   },
   serviceMeta: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.sm,
   },
   serviceRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   servicePrice: {
     color: colors.gold,
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
-  },
-  serviceArrow: {
-    color: colors.gold,
-    fontSize: typography.size.md,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
   },
   bottomPad: {
     height: spacing.xl,
@@ -236,7 +247,7 @@ const styles = StyleSheet.create({
   stickyFooter: {
     backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: colors.borderSubtle,
     padding: spacing.md,
     paddingBottom: spacing.lg,
   },
@@ -245,11 +256,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
     alignItems: 'center',
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   bookButtonText: {
     color: colors.textOnGold,
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 0.3,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0.4,
   },
 });

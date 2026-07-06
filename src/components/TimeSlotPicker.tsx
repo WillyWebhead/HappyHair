@@ -44,34 +44,37 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: spacing.sm,
   },
   chip: {
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginRight: spacing.sm,
-    marginBottom: spacing.sm,
+    paddingVertical: spacing.sm + 2,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderSubtle,
+    minWidth: 76,
+    alignItems: 'center',
   },
   chipSelected: {
     backgroundColor: colors.gold,
     borderColor: colors.gold,
   },
   chipUnavailable: {
-    opacity: 0.35,
+    backgroundColor: 'transparent',
+    opacity: 0.4,
   },
   chipText: {
-    color: colors.textPrimary,
+    color: colors.textSecondary,
     fontSize: typography.size.sm,
     fontWeight: typography.weight.medium,
   },
   chipTextSelected: {
     color: colors.textOnGold,
-    fontWeight: typography.weight.bold,
+    fontWeight: typography.weight.semibold,
   },
   chipTextUnavailable: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
+    textDecorationLine: 'line-through',
   },
 });

@@ -25,11 +25,19 @@ export default function StylistsScreen({ navigation }: Props) {
       style={styles.scroll}
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}>
-      <Text style={styles.subtitle}>
-        Each of our stylists brings a unique expertise.{'\n'}Find the perfect match for your look.
-      </Text>
+      <View style={styles.intro}>
+        <Text style={styles.overline}>The Team</Text>
+        <Text style={styles.subtitle}>
+          Each of our stylists brings a unique expertise.{'\n'}
+          Find the perfect match for your look.
+        </Text>
+      </View>
 
-      <View style={[styles.grid, { flexDirection: columns > 1 ? 'row' : 'column' }]}>
+      <View
+        style={[
+          styles.grid,
+          { flexDirection: columns > 1 ? 'row' : 'column' },
+        ]}>
         {MOCK_STYLISTS.map(stylist => (
           <StylistCard
             key={stylist.id}
@@ -53,13 +61,24 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     paddingBottom: spacing.xxxl,
   },
+  intro: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    marginHorizontal: spacing.md,
+  },
+  overline: {
+    color: colors.gold,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWider,
+    textTransform: 'uppercase',
+    marginBottom: spacing.sm,
+  },
   subtitle: {
     color: colors.textSecondary,
     fontSize: typography.size.base,
     textAlign: 'center',
     lineHeight: typography.size.base * 1.6,
-    marginBottom: spacing.lg,
-    marginHorizontal: spacing.md,
   },
   grid: {
     flexWrap: 'wrap',

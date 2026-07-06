@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
   TextInput,
+  TextInputProps,
   View,
 } from 'react-native';
 import { colors, radius, spacing, typography } from '../theme';
@@ -26,45 +27,37 @@ export default function BookingForm({ value, onChange }: Props) {
   return (
     <View>
       <Field label="Full Name" required>
-        <TextInput
-          style={styles.input}
+        <Input
           value={value.name}
           onChangeText={update('name')}
           placeholder="Your name"
-          placeholderTextColor={colors.textSecondary}
           autoComplete="name"
         />
       </Field>
       <Field label="Phone Number" required>
-        <TextInput
-          style={styles.input}
+        <Input
           value={value.phone}
           onChangeText={update('phone')}
           placeholder="(555) 000-0000"
-          placeholderTextColor={colors.textSecondary}
           keyboardType="phone-pad"
           autoComplete="tel"
         />
       </Field>
       <Field label="Email Address" required>
-        <TextInput
-          style={styles.input}
+        <Input
           value={value.email}
           onChangeText={update('email')}
           placeholder="you@example.com"
-          placeholderTextColor={colors.textSecondary}
           keyboardType="email-address"
           autoComplete="email"
           autoCapitalize="none"
         />
       </Field>
-      <Field label="Notes (optional)">
-        <TextInput
-          style={[styles.input, styles.inputMultiline]}
+      <Field label="Notes" optional>
+        <Input
           value={value.notes}
           onChangeText={update('notes')}
-          placeholder="Anything the stylist should know..."
-          placeholderTextColor={colors.textSecondary}
+          placeholder="Anything the stylist should know"
           multiline
           numberOfLines={3}
         />
@@ -73,13 +66,34 @@ export default function BookingForm({ value, onChange }: Props) {
   );
 }
 
+function Input({ multiline, style, ...props }: TextInputProps) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <TextInput
+      {...props}
+      multiline={multiline}
+      placeholderTextColor={colors.textTertiary}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      style={[
+        styles.input,
+        multiline && styles.inputMultiline,
+        focused && styles.inputFocused,
+        style,
+      ]}
+    />
+  );
+}
+
 function Field({
   label,
   required,
+  optional,
   children,
 }: {
   label: string;
   required?: boolean;
+  optional?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -87,6 +101,7 @@ function Field({
       <Text style={styles.label}>
         {label}
         {required && <Text style={styles.required}> *</Text>}
+        {optional && <Text style={styles.optional}>  ·  Optional</Text>}
       </Text>
       {children}
     </View>
@@ -99,28 +114,36 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.textSecondary,
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.medium,
-    marginBottom: spacing.xs,
-    letterSpacing: 0.5,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.semibold,
+    marginBottom: spacing.sm,
+    letterSpacing: typography.trackingWide,
     textTransform: 'uppercase',
   },
   required: {
     color: colors.gold,
   },
+  optional: {
+    color: colors.textTertiary,
+    fontWeight: typography.weight.regular,
+  },
   input: {
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.sm + 4,
     color: colors.textPrimary,
     fontSize: typography.size.base,
   },
+  inputFocused: {
+    borderColor: colors.gold,
+    backgroundColor: colors.surfaceRaised,
+  },
   inputMultiline: {
-    height: 80,
+    height: 88,
     textAlignVertical: 'top',
-    paddingTop: spacing.sm + 2,
+    paddingTop: spacing.sm + 4,
   },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { colors } from '../theme';
+import { colors, typography } from '../theme';
 import HomeScreen from '../screens/HomeScreen';
 import StylistsScreen from '../screens/StylistsScreen';
 import StylistDetailScreen from '../screens/StylistDetailScreen';
@@ -32,14 +32,20 @@ export default function AppNavigator() {
         initialRouteName="Home"
         screenOptions={{
           headerStyle: {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.background,
             shadowColor: 'transparent',
             elevation: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.borderSubtle,
           },
           headerTintColor: colors.gold,
+          headerTitleAlign: 'center',
+          headerBackTitleStyle: { fontSize: typography.size.sm },
           headerTitleStyle: {
             color: colors.textPrimary,
-            fontWeight: '600',
+            fontSize: typography.size.base,
+            fontWeight: typography.weight.semibold,
+            letterSpacing: 0.3,
           },
           cardStyle: { backgroundColor: colors.background },
           gestureEnabled: true,
@@ -62,7 +68,7 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Booking"
           component={BookingScreen}
-          options={{ title: 'Book Appointment' }}
+          options={{ title: 'Book an Appointment' }}
         />
         <Stack.Screen
           name="Confirmation"
