@@ -19,23 +19,26 @@ export default function ServiceBadge({ label, variant = 'default' }: Props) {
 
 const styles = StyleSheet.create({
   badge: {
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: radius.pill,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.xs + 1,
     marginRight: spacing.sm,
     marginBottom: spacing.sm,
   },
   badgeSelected: {
-    backgroundColor: colors.gold,
+    backgroundColor: colors.goldTint,
+    borderColor: colors.goldMuted,
   },
   text: {
     color: colors.textSecondary,
     fontSize: typography.size.xs,
     fontWeight: typography.weight.medium,
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
   },
   textSelected: {
-    color: colors.textOnGold,
+    color: colors.goldLight,
   },
 });

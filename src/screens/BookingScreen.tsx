@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,6 +14,7 @@ import {
   generateTimeSlots,
   getNextDays,
   formatDate,
+  formatDuration,
   generateConfirmationCode,
 } from '../data/stylists';
 import TimeSlotPicker from '../components/TimeSlotPicker';
@@ -43,6 +43,7 @@ export default function BookingScreen({ navigation, route }: Props) {
     email: '',
     notes: '',
   });
+  const [error, setError] = useState<string | null>(null);
 
   if (!stylist) {
     return (
@@ -58,26 +59,27 @@ export default function BookingScreen({ navigation, route }: Props) {
 
   const handleConfirm = () => {
     if (!selectedServiceId) {
-      Alert.alert('Select a service', 'Please choose a service to book.');
+      setError('Please choose a service to book.');
       return;
     }
     if (!selectedSlotId) {
-      Alert.alert('Select a time', 'Please choose an available time slot.');
+      setError('Please choose an available time slot.');
       return;
     }
     if (!form.name.trim()) {
-      Alert.alert('Name required', 'Please enter your full name.');
+      setError('Please enter your full name.');
       return;
     }
     if (!form.phone.trim()) {
-      Alert.alert('Phone required', 'Please enter your phone number.');
+      setError('Please enter your phone number.');
       return;
     }
     if (!form.email.trim()) {
-      Alert.alert('Email required', 'Please enter your email address.');
+      setError('Please enter your email address.');
       return;
     }
 
+    setError(null);
     navigation.navigate('Confirmation', {
       confirmationCode: generateConfirmationCode(),
       stylistId: stylist.id,
@@ -107,36 +109,44 @@ export default function BookingScreen({ navigation, route }: Props) {
 
       {/* Section: Service */}
       <SectionHeader title="Service" />
-      {stylist.services.map(service => {
-        const isSelected = service.id === selectedServiceId;
-        return (
-          <TouchableOpacity
-            key={service.id}
-            style={[styles.serviceRow, isSelected && styles.serviceRowSelected]}
-            onPress={() => setSelectedServiceId(service.id)}
-            activeOpacity={0.7}>
-            <View style={styles.serviceLeft}>
-              <View style={[styles.radio, isSelected && styles.radioSelected]}>
-                {isSelected && <View style={styles.radioDot} />}
+      <View style={styles.serviceList}>
+        {stylist.services.map((service, i) => {
+          const isSelected = service.id === selectedServiceId;
+          return (
+            <TouchableOpacity
+              key={service.id}
+              style={[
+                styles.serviceRow,
+                i > 0 && styles.serviceRowBorder,
+                isSelected && styles.serviceRowSelected,
+              ]}
+              onPress={() => {
+                setSelectedServiceId(service.id);
+                setError(null);
+              }}
+              activeOpacity={0.7}>
+              <View style={styles.serviceLeft}>
+                <View style={[styles.radio, isSelected && styles.radioSelected]}>
+                  {isSelected && <View style={styles.radioDot} />}
+                </View>
+                <View>
+                  <Text style={styles.serviceName}>{service.name}</Text>
+                  <Text style={styles.serviceMeta}>
+                    {formatDuration(service.durationMinutes)}
+                  </Text>
+                </View>
               </View>
-              <View>
-                <Text style={styles.serviceName}>{service.name}</Text>
-                <Text style={styles.serviceMeta}>
-                  {Math.floor(service.durationMinutes / 60) > 0
-                    ? `${Math.floor(service.durationMinutes / 60)}h `
-                    : ''}
-                  {service.durationMinutes % 60 > 0
-                    ? `${service.durationMinutes % 60}m`
-                    : ''}
-                </Text>
-              </View>
-            </View>
-            <Text style={[styles.servicePrice, isSelected && styles.servicePriceSelected]}>
-              ${service.priceUsd}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
+              <Text
+                style={[
+                  styles.servicePrice,
+                  isSelected && styles.servicePriceSelected,
+                ]}>
+                ${service.priceUsd}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
 
       {/* Section: Date */}
       <SectionHeader title="Date" />
@@ -146,8 +156,8 @@ export default function BookingScreen({ navigation, route }: Props) {
         contentContainerStyle={styles.dateRow}>
         {DAYS.map(day => {
           const isSelected = day === selectedDate;
-          const [, month, date] = day.split('-');
-          const d = new Date(parseInt(day.split('-')[0], 10), parseInt(month, 10) - 1, parseInt(date, 10));
+          const [year, month, date] = day.split('-').map(Number);
+          const d = new Date(year, month - 1, date);
           const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
           const dayNum = d.getDate();
           const monthName = d.toLocaleDateString('en-US', { month: 'short' });
@@ -158,15 +168,25 @@ export default function BookingScreen({ navigation, route }: Props) {
               onPress={() => {
                 setSelectedDate(day);
                 setSelectedSlotId(null);
+                setError(null);
               }}
               activeOpacity={0.7}>
-              <Text style={[styles.dateDayName, isSelected && styles.dateTextSelected]}>
+              <Text
+                style={[
+                  styles.dateDayName,
+                  isSelected && styles.dateDayNameSelected,
+                ]}>
                 {dayName}
               </Text>
-              <Text style={[styles.dateDayNum, isSelected && styles.dateTextSelected]}>
+              <Text
+                style={[styles.dateDayNum, isSelected && styles.dateTextSelected]}>
                 {dayNum}
               </Text>
-              <Text style={[styles.dateMonth, isSelected && styles.dateTextSelected]}>
+              <Text
+                style={[
+                  styles.dateMonth,
+                  isSelected && styles.dateDayNameSelected,
+                ]}>
                 {monthName}
               </Text>
             </TouchableOpacity>
@@ -180,13 +200,22 @@ export default function BookingScreen({ navigation, route }: Props) {
         <TimeSlotPicker
           slots={timeSlots}
           selectedId={selectedSlotId}
-          onSelect={setSelectedSlotId}
+          onSelect={id => {
+            setSelectedSlotId(id);
+            setError(null);
+          }}
         />
       </View>
 
       {/* Section: Your Details */}
       <SectionHeader title="Your Details" />
-      <BookingForm value={form} onChange={setForm} />
+      <BookingForm
+        value={form}
+        onChange={values => {
+          setForm(values);
+          setError(null);
+        }}
+      />
 
       {/* Summary */}
       {selectedService && selectedSlotId && (
@@ -197,11 +226,20 @@ export default function BookingScreen({ navigation, route }: Props) {
           <SummaryRow label="Date" value={formatDate(selectedDate)} />
           <SummaryRow label="Time" value={selectedSlot?.time ?? ''} />
           <View style={styles.summaryDivider} />
-          <SummaryRow label="Total" value={`$${selectedService.priceUsd}`} highlight />
+          <SummaryRow
+            label="Total"
+            value={`$${selectedService.priceUsd}`}
+            highlight
+          />
         </View>
       )}
 
       {/* Confirm */}
+      {error && (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorBannerText}>{error}</Text>
+        </View>
+      )}
       <TouchableOpacity
         style={styles.confirmButton}
         onPress={handleConfirm}
@@ -218,6 +256,7 @@ function SectionHeader({ title }: { title: string }) {
   return (
     <View style={sectionStyles.container}>
       <Text style={sectionStyles.text}>{title}</Text>
+      <View style={sectionStyles.rule} />
     </View>
   );
 }
@@ -234,7 +273,8 @@ function SummaryRow({
   return (
     <View style={summaryRowStyles.row}>
       <Text style={summaryRowStyles.label}>{label}</Text>
-      <Text style={[summaryRowStyles.value, highlight && summaryRowStyles.highlight]}>
+      <Text
+        style={[summaryRowStyles.value, highlight && summaryRowStyles.highlight]}>
         {value}
       </Text>
     </View>
@@ -243,16 +283,23 @@ function SummaryRow({
 
 const sectionStyles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
     marginTop: spacing.xl,
     marginBottom: spacing.md,
-    borderLeftWidth: 2,
-    borderLeftColor: colors.gold,
-    paddingLeft: spacing.sm,
   },
   text: {
-    color: colors.textPrimary,
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
+    color: colors.textTertiary,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWider,
+    textTransform: 'uppercase',
+  },
+  rule: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.borderSubtle,
   },
 });
 
@@ -260,6 +307,7 @@ const summaryRowStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'baseline',
     marginBottom: spacing.sm,
   },
   label: {
@@ -273,8 +321,8 @@ const summaryRowStyles = StyleSheet.create({
   },
   highlight: {
     color: colors.gold,
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.semibold,
   },
 });
 
@@ -304,6 +352,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
     padding: spacing.md,
     gap: spacing.md,
     marginBottom: spacing.sm,
@@ -314,37 +364,45 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     backgroundColor: colors.surfaceRaised,
-    borderWidth: 2,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
   miniInitials: {
     color: colors.gold,
+    fontFamily: typography.fontFamilyHeading,
     fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
   },
   stylistName: {
     color: colors.textPrimary,
     fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
+    fontWeight: typography.weight.semibold,
+    marginBottom: spacing.xxs,
   },
   stylistTitle: {
     color: colors.textSecondary,
     fontSize: typography.size.sm,
   },
+  serviceList: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    overflow: 'hidden',
+  },
   serviceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
     padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: 'transparent',
+    paddingHorizontal: spacing.lg,
+  },
+  serviceRowBorder: {
+    borderTopWidth: 1,
+    borderTopColor: colors.borderSubtle,
   },
   serviceRowSelected: {
-    borderColor: colors.gold,
+    backgroundColor: colors.goldTint,
   },
   serviceLeft: {
     flexDirection: 'row',
@@ -353,10 +411,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 1.5,
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
@@ -365,19 +423,19 @@ const styles = StyleSheet.create({
     borderColor: colors.gold,
   },
   radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: colors.gold,
   },
   serviceName: {
     color: colors.textPrimary,
     fontSize: typography.size.base,
     fontWeight: typography.weight.medium,
-    marginBottom: 2,
+    marginBottom: spacing.xxs,
   },
   serviceMeta: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.sm,
   },
   servicePrice: {
@@ -387,6 +445,7 @@ const styles = StyleSheet.create({
   },
   servicePriceSelected: {
     color: colors.gold,
+    fontWeight: typography.weight.semibold,
   },
   dateRow: {
     paddingBottom: spacing.sm,
@@ -398,33 +457,40 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     alignItems: 'center',
-    minWidth: 56,
+    minWidth: 60,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderSubtle,
   },
   dateChipSelected: {
     backgroundColor: colors.gold,
     borderColor: colors.gold,
   },
   dateDayName: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.xs,
     fontWeight: typography.weight.medium,
-    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: spacing.xxs,
   },
   dateDayNum: {
     color: colors.textPrimary,
     fontSize: typography.size.lg,
-    fontWeight: typography.weight.bold,
+    fontWeight: typography.weight.semibold,
     lineHeight: typography.size.lg * 1.2,
   },
   dateMonth: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.xs,
-    marginTop: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: spacing.xxs,
   },
   dateTextSelected: {
     color: colors.textOnGold,
+  },
+  dateDayNameSelected: {
+    color: 'rgba(26, 22, 15, 0.65)',
   },
   timeContainer: {
     marginBottom: spacing.sm,
@@ -436,30 +502,47 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.card,
   },
   summaryTitle: {
-    color: colors.textPrimary,
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
+    color: colors.textTertiary,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWider,
+    textTransform: 'uppercase',
     marginBottom: spacing.md,
   },
   summaryDivider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: colors.borderSubtle,
     marginVertical: spacing.sm,
+  },
+  errorBanner: {
+    backgroundColor: 'rgba(217, 139, 139, 0.10)',
+    borderWidth: 1,
+    borderColor: 'rgba(217, 139, 139, 0.35)',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.lg,
+  },
+  errorBannerText: {
+    color: colors.error,
+    fontSize: typography.size.sm,
+    textAlign: 'center',
   },
   confirmButton: {
     backgroundColor: colors.gold,
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
     alignItems: 'center',
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
+    ...shadows.card,
   },
   confirmText: {
     color: colors.textOnGold,
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 0.3,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0.4,
   },
   bottomPad: {
     height: spacing.xxxl,

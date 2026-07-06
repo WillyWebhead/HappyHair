@@ -1,76 +1,66 @@
 import React from 'react';
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions,
-  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors, spacing, typography, radius } from '../theme';
+import { colors, radius, shadows, spacing, typography } from '../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
-export default function HomeScreen({ navigation }: Props) {
-  const { width } = useWindowDimensions();
-  const isWide = width > 600;
+const HIGHLIGHTS = ['5 Expert Stylists', 'All Hair Types', 'Same-Week Booking'];
 
+export default function HomeScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          isWide && styles.containerWide,
-        ]}
+        contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}>
-        {/* Salon label above oval */}
-        <View style={styles.topBar}>
-          <View style={styles.dot} />
-          <Text style={styles.salonLabel}>HAPPY HAIR SALON</Text>
-          <View style={styles.dot} />
-        </View>
+        <View style={styles.content}>
+          {/* Wordmark */}
+          <View style={styles.hero}>
+            <View style={styles.overlineRow}>
+              <View style={styles.overlineRule} />
+              <Text style={styles.overline}>Salon &amp; Studio</Text>
+              <View style={styles.overlineRule} />
+            </View>
 
-        {/* Oval hero card */}
-        <View style={styles.ovalCard}>
-          <Text style={styles.heroTitle}>Happy{'\n'}Hair</Text>
-        </View>
+            <Text style={styles.heroTitle}>Happy Hair</Text>
 
-        {/* Tagline below oval */}
-        <View style={styles.divider} />
-        <Text style={styles.tagline}>
-          Expert stylists. Effortless booking.{'\n'}Your best look awaits.
-        </Text>
-        <View style={styles.taglineGap} />
+            <Text style={styles.tagline}>
+              Expert stylists. Effortless booking.{'\n'}Your best look awaits.
+            </Text>
+          </View>
 
-        {/* CTA */}
-        <TouchableOpacity
-          style={styles.ctaButton}
-          onPress={() => navigation.navigate('Stylists')}
-          activeOpacity={0.85}>
-          <Text style={styles.ctaText}>Meet Our Stylists</Text>
-        </TouchableOpacity>
+          {/* CTA */}
+          <View style={styles.ctaBlock}>
+            <TouchableOpacity
+              style={styles.ctaButton}
+              onPress={() => navigation.navigate('Stylists')}
+              activeOpacity={0.85}>
+              <Text style={styles.ctaText}>Meet Our Stylists</Text>
+            </TouchableOpacity>
+            <Text style={styles.ctaCaption}>
+              Book in minutes — no account needed
+            </Text>
+          </View>
 
-        <TouchableOpacity
-          style={styles.secondaryCta}
-          onPress={() => navigation.navigate('Stylists')}
-          activeOpacity={0.7}>
-          <Text style={styles.secondaryCtaText}>Book in minutes · No account needed</Text>
-        </TouchableOpacity>
-
-        {/* Feature pills */}
-        <View style={styles.features}>
-          {['5 Expert Stylists', 'All Hair Types', 'Same-Week Booking'].map(
-            feature => (
-              <View key={feature} style={styles.featurePill}>
-                <Text style={styles.featurePillText}>{feature}</Text>
-              </View>
-            ),
-          )}
+          {/* Highlights */}
+          <View style={styles.highlights}>
+            {HIGHLIGHTS.map((item, i) => (
+              <React.Fragment key={item}>
+                {i > 0 && <View style={styles.highlightDivider} />}
+                <Text style={styles.highlightText}>{item}</Text>
+              </React.Fragment>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -84,113 +74,98 @@ const styles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.xxl,
-    paddingBottom: spacing.xxxl,
-    alignItems: 'center',
-  },
-  containerWide: {
-    maxWidth: 480,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  ovalCard: {
-    alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: 120,
-    paddingHorizontal: spacing.xxxl,
+    paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xxl,
-    marginBottom: spacing.sm,
-    // scaleX makes the circle wider than tall → oval
-    transform: [{ scaleX: 1.15 }],
   },
-  topBar: {
+  content: {
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
+  hero: {
+    alignItems: 'center',
+    marginBottom: spacing.xxl,
+  },
+  overlineRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.sm,
-    gap: spacing.sm,
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+    alignSelf: 'stretch',
   },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.gold,
+  overlineRule: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
   },
-  salonLabel: {
+  overline: {
     color: colors.gold,
     fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 3,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWider,
+    textTransform: 'uppercase',
   },
   heroTitle: {
     fontFamily: typography.fontFamilyHeading,
     fontSize: typography.size.hero,
-    fontWeight: typography.weight.bold,
+    fontWeight: typography.weight.regular,
     color: colors.textPrimary,
     textAlign: 'center',
-    lineHeight: typography.size.hero * 1.1,
-    letterSpacing: -1,
-    transform: [{ scaleX: 1 / 1.15 }],
-  },
-  divider: {
-    width: 48,
-    height: 2,
-    backgroundColor: colors.gold,
-    borderRadius: radius.pill,
-    marginTop: spacing.sm,
-    marginBottom: spacing.md,
+    lineHeight: typography.size.hero * 1.08,
+    letterSpacing: 0.5,
+    marginBottom: spacing.lg,
   },
   tagline: {
     color: colors.textSecondary,
     fontSize: typography.size.base,
     textAlign: 'center',
-    lineHeight: typography.size.base * 1.6,
+    lineHeight: typography.size.base * 1.65,
     fontWeight: typography.weight.regular,
   },
-  taglineGap: {
-    height: spacing.xxl,
+  ctaBlock: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: spacing.xxl,
   },
   ctaButton: {
     backgroundColor: colors.gold,
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xxl,
-    marginBottom: spacing.md,
     width: '100%',
     alignItems: 'center',
+    marginBottom: spacing.md,
+    ...shadows.card,
   },
   ctaText: {
     color: colors.textOnGold,
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 0.3,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0.4,
   },
-  secondaryCta: {
-    marginBottom: spacing.xxxl,
-  },
-  secondaryCtaText: {
-    color: colors.textSecondary,
+  ctaCaption: {
+    color: colors.textTertiary,
     fontSize: typography.size.sm,
     textAlign: 'center',
   },
-  features: {
+  highlights: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
+    gap: spacing.sm + 2,
   },
-  featurePill: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.md,
+  highlightDivider: {
+    width: 1,
+    height: 11,
+    backgroundColor: colors.border,
   },
-  featurePillText: {
+  highlightText: {
     color: colors.textSecondary,
-    fontSize: typography.size.xs,
+    fontSize: 10,
     fontWeight: typography.weight.medium,
-    letterSpacing: 0.3,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 });

@@ -11,6 +11,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { MOCK_STYLISTS, formatDateLong } from '../data/stylists';
+import { Check } from '../components/icons';
 import { colors, radius, shadows, spacing, typography } from '../theme';
 
 type Props = {
@@ -38,19 +39,18 @@ export default function ConfirmationScreen({ navigation, route }: Props) {
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}>
-        {/* Check icon */}
         <View style={styles.checkCircle}>
-          <Text style={styles.checkMark}>✓</Text>
+          <Check />
         </View>
 
-        <Text style={styles.heading}>Booking Confirmed!</Text>
+        <Text style={styles.heading}>Booking Confirmed</Text>
         <Text style={styles.subheading}>
           See you soon, {customerName.split(' ')[0]}.
         </Text>
 
         {/* Confirmation code */}
         <View style={styles.codeBox}>
-          <Text style={styles.codeLabel}>CONFIRMATION CODE</Text>
+          <Text style={styles.codeLabel}>Confirmation Code</Text>
           <Text style={styles.codeValue}>{confirmationCode}</Text>
         </View>
 
@@ -72,18 +72,22 @@ export default function ConfirmationScreen({ navigation, route }: Props) {
 
           <View style={styles.divider} />
 
-          <DetailRow icon="✂" label="Service" value={service?.name ?? serviceId} />
-          <DetailRow icon="📅" label="Date" value={formatDateLong(date)} />
-          <DetailRow icon="🕐" label="Time" value={time} />
+          <DetailRow label="Service" value={service?.name ?? serviceId} />
+          <DetailRow label="Date" value={formatDateLong(date)} />
+          <DetailRow label="Time" value={time} />
           {service && (
-            <DetailRow icon="💰" label="Total" value={`$${service.priceUsd}`} highlight />
+            <>
+              <View style={styles.divider} />
+              <DetailRow label="Total" value={`$${service.priceUsd}`} highlight />
+            </>
           )}
         </View>
 
         {/* Notice */}
         <View style={styles.notice}>
           <Text style={styles.noticeText}>
-            We'll send a reminder the day before your appointment. Please arrive 5 minutes early.
+            We'll send a reminder the day before your appointment. Please
+            arrive 5 minutes early.
           </Text>
         </View>
 
@@ -107,25 +111,20 @@ export default function ConfirmationScreen({ navigation, route }: Props) {
 }
 
 function DetailRow({
-  icon,
   label,
   value,
   highlight,
 }: {
-  icon: string;
   label: string;
   value: string;
   highlight?: boolean;
 }) {
   return (
     <View style={detailStyles.row}>
-      <Text style={detailStyles.icon}>{icon}</Text>
-      <View style={detailStyles.content}>
-        <Text style={detailStyles.label}>{label}</Text>
-        <Text style={[detailStyles.value, highlight && detailStyles.highlight]}>
-          {value}
-        </Text>
-      </View>
+      <Text style={detailStyles.label}>{label}</Text>
+      <Text style={[detailStyles.value, highlight && detailStyles.highlight]}>
+        {value}
+      </Text>
     </View>
   );
 }
@@ -133,35 +132,29 @@ function DetailRow({
 const detailStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: spacing.md,
     marginBottom: spacing.md,
-    gap: spacing.sm,
-  },
-  icon: {
-    fontSize: typography.size.base,
-    width: 24,
-    textAlign: 'center',
-    marginTop: 2,
-  },
-  content: {
-    flex: 1,
   },
   label: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.xs,
-    fontWeight: typography.weight.medium,
-    letterSpacing: 0.5,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWide,
     textTransform: 'uppercase',
-    marginBottom: 2,
   },
   value: {
     color: colors.textPrimary,
     fontSize: typography.size.base,
     fontWeight: typography.weight.medium,
+    flexShrink: 1,
+    textAlign: 'right',
   },
   highlight: {
     color: colors.gold,
-    fontWeight: typography.weight.bold,
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.semibold,
   },
 });
 
@@ -174,32 +167,27 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: spacing.xl,
     alignItems: 'center',
+    justifyContent: 'center',
     maxWidth: 520,
     alignSelf: 'center',
     width: '100%',
   },
   checkCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.goldMuted,
-    borderWidth: 2,
-    borderColor: colors.gold,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.goldTint,
+    borderWidth: 1,
+    borderColor: colors.goldMuted,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.lg,
-    marginTop: spacing.xl,
-  },
-  checkMark: {
-    color: colors.gold,
-    fontSize: 36,
-    fontWeight: typography.weight.bold,
-    lineHeight: 44,
+    // Optical centering — the drawn check sits slightly high
+    paddingTop: 6,
   },
   heading: {
     color: colors.textPrimary,
     fontSize: typography.size.xl,
-    fontWeight: typography.weight.bold,
     fontFamily: typography.fontFamilyHeading,
     textAlign: 'center',
     marginBottom: spacing.xs,
@@ -215,39 +203,42 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
     width: '100%',
   },
   codeLabel: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 2,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWider,
+    textTransform: 'uppercase',
     marginBottom: spacing.xs,
   },
   codeValue: {
     color: colors.gold,
-    fontSize: typography.size.xl,
-    fontWeight: typography.weight.bold,
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.semibold,
     letterSpacing: 4,
     fontFamily: 'monospace',
   },
   detailCard: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
     padding: spacing.lg,
     width: '100%',
     marginBottom: spacing.lg,
     ...shadows.card,
   },
   detailCardTitle: {
-    color: colors.textSecondary,
+    color: colors.textTertiary,
     fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
-    letterSpacing: 2,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: typography.trackingWider,
     textTransform: 'uppercase',
     marginBottom: spacing.md,
   },
@@ -262,19 +253,20 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     backgroundColor: colors.surfaceRaised,
-    borderWidth: 2,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
   initials: {
     color: colors.gold,
+    fontFamily: typography.fontFamilyHeading,
     fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
   },
   stylistName: {
     color: colors.textPrimary,
     fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
+    fontWeight: typography.weight.semibold,
+    marginBottom: spacing.xxs,
   },
   stylistTitle: {
     color: colors.textSecondary,
@@ -282,16 +274,16 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border,
+    backgroundColor: colors.borderSubtle,
     marginBottom: spacing.md,
   },
   notice: {
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.xl,
     width: '100%',
-    borderLeftWidth: 3,
+    borderLeftWidth: 2,
     borderLeftColor: colors.gold,
   },
   noticeText: {
@@ -306,12 +298,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xxl,
     width: '100%',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
+    ...shadows.card,
   },
   homeButtonText: {
     color: colors.textOnGold,
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0.4,
   },
   anotherButton: {
     paddingVertical: spacing.md,
@@ -319,7 +313,8 @@ const styles = StyleSheet.create({
   },
   anotherButtonText: {
     color: colors.gold,
-    fontSize: typography.size.base,
+    fontSize: typography.size.sm,
     fontWeight: typography.weight.medium,
+    letterSpacing: 0.3,
   },
 });
